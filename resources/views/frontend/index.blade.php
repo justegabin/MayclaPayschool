@@ -326,99 +326,243 @@
                 <div class="modal-content custom-popup">
                 <div class="modal-header border-0">
                     <h5 class="modal-title fw-bold text-white text-center w-100" id="wizardModalLabel">
-                    ✨ Payer la scolarité WIZA22
+                    ✨ Se connecter
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
                 </div>
 
                 <div class="modal-body text-white">
                     <!-- Step 1 -->
-                    <div class="wizard-step" id="step1">
-                    <p>Choisissez une option :</p>
+                    <div class="wizard-step" id="step11">
+                   {{--  <p>Choisissez une option :</p> --}}
+
                     <div class="d-flex justify-content-center gap-3 mt-3 w-100">
-                        <button type="button" class="btn btn-gradient rounded-pill flex-fill" onclick="nextStep(2)">
+
+                        {{-- <button type="button" class="btn btn-gradient rounded-pill flex-fill" onclick="nextStep(22)">
                         Payer sans créer un compte
                         </button>
-                        <button type="button" class="btn btn-gradient rounded-pill flex-fill" onclick="nextStep(2)">
+                        <button type="button" class="btn btn-gradient rounded-pill flex-fill" onclick="nextStep(22)">
                         Se connecter / Créer un compte
-                        </button>
+                        </button> --}}
+
+                        {{-- =====================================================================
+                              ==================Debut du formaulaire =========================
+                        ========================================================================== --}}
+
+
+
+    <!-- Session Status -->
+    <x-auth-session-status class="mb-4" :status="session('status')" />
+
+                    <form method="POST" action="{{ route('login') }}">
+                        @csrf
+
+
+                        <!-- Email Address -->
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
+                                Email
+                            </label>
+                            <input id="email"  type="email" name="email" class="form-control rounded-pill flex-fill" required autofocus autocomplete="username">
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
+                                Mot de passe :
+                            </label>
+                            <input id="password" type="password" name="password" class="form-control rounded-pill flex-fill"   required autocomplete="current-password">
+                        </div>
+
+
+
+                    {{--  <!-- Email Address -->
+                        <div>
+                            <x-input-label for="email" :value="__('Email')" />
+                            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mt-4">
+                            <x-input-label for="password" :value="__('Password')" />
+
+                            <x-text-input id="password" class="block mt-1 w-full"
+                                            type="password"
+                                            name="password"
+                                            required autocomplete="current-password" />
+
+                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                        </div> --}}
+
+                        <!-- Remember Me -->
+
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            {{-- <label for="remember_me" class="inline-flex items-center">
+                                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
+                                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('enregistrer') }}</span>
+                            </label> --}}
+
+                            <!-- Mot de passe oublié -->
+                            @if (Route::has('password.request'))
+
+
+
+                                    {{-- <a class="underline text-sm text-black font-bold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    href="{{ route('password.request') }}">
+                                        {{ __('Mot de passe oublié ?') }}
+                                    </a>
+ --}}
+                                        <a class="underline text-sm text-black font-bold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                href="javascript:void(0)"
+                                                onclick="prevStep(33)">
+                                                    {{ __('Mot de passe oublié ?') }}
+                                        </a>
+
+
+                            @endif
+
+                        </div>
+
+                        <div class="flex items-center justify-end mt-4">
+
+
+                            {{-- <x-primary-button class="ms-3">
+                                {{ __('Log in') }}
+                            </x-primary-button> --}}
+
+
+                            <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(22)">
+                                        Créer un compte
+                            </button>
+
+                            <button type="submit" class="btn btn-gradient rounded-pill px-4">
+                                {{ __('Se connecter') }}
+                            </button>
+                        </div>
+                    </form>
+
+
+
+                        {{-- =====================================================================
+                        ==================================  Fin du formulaire ========================
+                        ==========================================================================--}}
+
                     </div>
                     </div>
 
                     <!-- Step 2 -->
-                    <div class="wizard-step d-none" id="step2">
-                    <p>Entrez le matricule de l'apprenant :</p>
-                    <form>
-                        <div class="mb-3">
-                        <label for="matriculeInput" class="form-label text-light">Matricule</label>
-                        <input type="text" class="form-control rounded-pill" id="matriculeInput" placeholder="Ex : MBJ25">
+                    <div class="wizard-step d-none" id="step22">
+                    <p>Créer un compte</p>
+                     {{-- Start form --}}
+                    <form method="POST" action="{{ route('register') }}">
+                        @csrf
+
+                         <!-- Nom-->
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
+                                Nom & Prénoms
+                            </label>
+                            <input  id="name"  type="text" name="name" class="form-control rounded-pill flex-fill" required autofocus autocomplete="name">
+                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
-                    </form>
+
+
+                        <!-- Email Address -->
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
+                                Email
+                            </label>
+                            <input id="email"  type="email" name="email" class="form-control rounded-pill flex-fill" required autofocus autocomplete="username">
+                            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
+                                Mot de passe :
+                            </label>
+                            <input id="password" type="password" name="password" class="form-control rounded-pill flex-fill"   required autocomplete="new-password">
+                            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
+                                Confirm Mot de passe :
+                            </label>
+                            <input id="password_confirmation" type="password" name="password_confirmation" class="form-control rounded-pill flex-fill"   required autocomplete="new-password">
+                            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+                        </div>
+
+                        {{-- <div class="flex items-center justify-end mt-4">
+                            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
+                                {{ __('Vous avez un compte?') }}
+                            </a>
+
+                            <x-primary-button class="ms-4">
+                                {{ __('Valider') }}
+                            </x-primary-button>
+                        </div> --}}
+
+
+
                     <div class="d-flex justify-content-between mt-3">
-                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(1)">
+                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(11)">
                         Retour
                         </button>
-                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(3)">
-                        Suivant
+                        {{-- <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(33)">
+                        Valider
+                        </button> --}}
+
+                        <button type="submit" class="btn btn-gradient rounded-pill px-4">
+                                {{ __('Valider') }}
                         </button>
                     </div>
+
+                </form>
+                    {{-- End form --}}
+
                     </div>
 
                     <!-- Step 3 -->
-                    <div class="wizard-step d-none" id="step3">
-                    <p>Choisissez le mode de paiement :</p>
+                    <div class="wizard-step d-none" id="step33">
+                    <p>Réinitialisation du mot de passe:</p>
                     <div class="d-flex flex-column gap-2">
 
-                        <form>
-                        <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Matricule
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="Ex : MBJ25">
-                        </div>
+                        <form method="POST" action="{{ route('password.email') }}">
+                            @csrf
 
-                        <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Nom & Prénoms
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="MAYOMBOU Maycla Esther">
-                        </div>
+                            <!-- Email Address -->
 
-                        <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Ecole
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="Ex : Lafontaine">
-                        </div>
+                            <div class="mb-3 d-flex align-items-center gap-3">
+                                <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
+                                Email
+                                </label>
+                                <input id="email" class="form-control rounded-pill flex-fill" type="email" name="email" required autofocus>
+                                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                            </div>
 
-                        <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Scolarité mensuelle
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="70.000 FCFA">
-                        </div>
-
-                        </form>
-
-                        {{-- <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(4)">
-                        Carte bancaire
-                        </button>
-                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(4)">
-                        Mobile Money
-                        </button> --}}
                     </div>
                     <div class="d-flex justify-content-between mt-3">
-                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(2)">
+                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(11)">
                         Retour
                         </button>
-                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(4)">
-                        Valider
+                        <button type="submit" class="btn btn-gradient rounded-pill px-4">
+                        Lien de réinitialisation
                         </button>
+                        {{-- <div class="flex items-center justify-end mt-4">
+                                <x-primary-button>
+                                    {{ __('Lien de réinitialisation du mot de passe par e-mail') }}
+                                </x-primary-button>
+                        </div> --}}
                     </div>
                     </div>
 
+                    </form>
+
                     <!-- Step 4 -->
-                    <div class="wizard-step d-none" id="step4">
+                    <div class="wizard-step d-none" id="step44">
                     <p>Confirmez votre paiement :</p>
 
                     <form>
@@ -458,13 +602,13 @@
 
 
                     <div class="d-flex justify-content-between mt-3">
-                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(3)">
+                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(33)">
                         Retour
                         </button>
                         {{-- <button type="button" class="btn btn-gradient rounded-pill px-4" data-bs-dismiss="modal">
                         Confirmer
                         </button> --}}
-                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(5)">
+                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(55)">
                         Valider
                         </button>
                     </div>
@@ -472,7 +616,7 @@
                     </div>
 
                     <!-- Step 5 -->
-                    <div class="wizard-step d-none" id="step5">
+                    <div class="wizard-step d-none" id="step55">
                     <div class="text-center">
                         <h5 class="fw-bold text-success">✅ Paiement réussi !</h5>
                         <p class="mt-3">Votre paiement a été effectué avec succès.
