@@ -28,6 +28,10 @@
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 
+   <!--  SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
   <!-- =======================================================
       DEBUT CSS POP UP
   ======================================================== -->
@@ -88,6 +92,33 @@
 
   <!-- =======================================================
       FIN CSS POP UP
+  ======================================================== -->
+
+
+  <!-- =======================================================
+      DEBUT  CSS VALIDATION PAIEMENT MOBILE MONEY
+  ======================================================== -->
+
+    <style>
+            .is-valid {
+                border-color: #28a745 !important;
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right calc(0.375em + 0.1875rem) center;
+                background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+            }
+
+            .is-invalid {
+                border-color: #dc3545 !important;
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right calc(0.375em + 0.1875rem) center;
+                background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+            }
+    </style>
+
+  <!-- =======================================================
+      FIN CSS VALIDATION PAIEMENT MOBILE MONEY
   ======================================================== -->
 
 </head>
@@ -233,15 +264,32 @@
                             <label class="form-label text-light mb-0" style="width: 140px;">Frais de service</label>
                             <input type="text" class="form-control rounded-pill flex-fill" id="displayFrais" readonly>
                         </div>
+
+                        <!-- AJOUTEZ CES DEUX CHAMPS DE SAISIE -->
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label for="mobileMoneyType" class="form-label text-light mb-0" style="width: 140px;">Type mobile money</label>
+                            <select id="mobileMoneyType" class="form-control rounded-pill flex-fill">
+                                <option value="">-- Sélectionnez --</option>
+                                <option value="airtel">Airtel Money</option>
+                                <option value="moov">Moov Money</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label class="form-label text-light mb-0" style="width: 140px;">Numéro de téléphone</label>
+                            <input type="text" class="form-control rounded-pill flex-fill" id="telStep3" placeholder="074273811">
+                        </div>
+                        <!-- FIN DES CHAMPS AJOUTÉS -->
                     </div>
                     <div class="d-flex justify-content-between mt-3">
                         <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(2)">Retour</button>
-                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(4)">Valider</button>
+                        {{-- <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(5)">Valider</button> --}}
+                        {{-- <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="validerEtPasserEtape4()">Valider</button> --}}
+                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="validerEtPasserEtape5()">Valider</button>
                     </div>
                 </div>
 
                 {{-- Step 4 --}}
-                <div class="wizard-step d-none" id="step4">
+                {{-- <div class="wizard-step d-none" id="step4">
                     <p>Confirmez votre paiement :</p>
                     <form id="formStep4">
                         <div class="mb-3 d-flex align-items-center gap-3">
@@ -269,18 +317,53 @@
                         <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(3)">Retour</button>
                         <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(5)">Valider</button>
                     </div>
-                </div>
+                </div> --}}
 
                 {{-- Step 5 --}}
-                <div class="wizard-step d-none" id="step5">
+                {{-- <div class="wizard-step d-none" id="step5">
                     <div class="text-center">
                         <h5 class="fw-bold text-success">✅ Paiement réussi !</h5>
-                        <p class="mt-3">Votre paiement a été effectué avec succès. Un reçu vous a été envoyé par SMS.</p>
+                        <p class="mt-3">Votre paiement es  été effectué avec succès. Un reçu vous a été envoyé par SMS.</p>
                     </div>
                     <div class="d-flex justify-content-center mt-4">
                         <button type="button" class="btn btn-gradient rounded-pill px-4" data-bs-dismiss="modal">Terminer</button>
                     </div>
+                </div> --}}
+
+                {{-- <div class="wizard-step d-none" id="step5">
+                    <div class="text-center">
+                        <h5 class="fw-bold text-warning">⏳ Validation du paiement</h5>
+                        <p class="mt-3">Un pop-up de confirmation vient d'être envoyé sur votre téléphone.</p>
+                        <p>Veuillez saisir votre mot de passe Mobile Money pour finaliser la transaction.</p>
+                        <div class="spinner-border text-light mt-3" role="status">
+                            <span class="visually-hidden">En attente de confirmation...</span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="button" class="btn btn-gradient rounded-pill px-4" data-bs-dismiss="modal">Terminer</button>
+                    </div>
+                </div> --}}
+
+
+                <div class="wizard-step d-none" id="step5">
+                    <div class="text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-phone text-warning" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="fw-bold text-warning">Validation requise</h5>
+                        {{-- <p class="mt-3">Un message de confirmation a été envoyé sur votre téléphone.</p> --}}
+                        <p>Veuillez saisir votre <strong>mot de passe Mobile Money</strong> dans le pop-up qui s'affiche pour finaliser le paiement.</p>
+
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle"></i> Si le pop-up n'apparaît pas, reprenez la procédure
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-center mt-4">
+                        <button type="button" class="btn btn-outline-light rounded-pill px-4 me-2" onclick="prevStep(4)">Retour</button>
+                        <button type="button" class="btn btn-gradient rounded-pill px-4" data-bs-dismiss="modal">Terminer</button>
+                    </div>
                 </div>
+                {{-- FIN --}}
 
             </div>
         </div>
@@ -1154,6 +1237,163 @@ document.getElementById('matriculeInput').addEventListener('keypress', function(
          FIN DU   SCRIPT POUR AFFICHER L'APPRENANT -->
  =======================================================================================
 
+*/
+
+
+/*
+=======================================================================================
+VALIDATION DE FORMULAIRE POUR LA SAISIE MOBILE MONEY
+====================================================================================== */
+
+// Validation des numéros de téléphone selon l'opérateur
+// Validation des numéros de téléphone selon l'opérateur
+document.getElementById('mobileMoneyType').addEventListener('change', function() {
+    validatePhoneNumber();
+});
+
+document.getElementById('telStep3').addEventListener('input', function() {
+    validatePhoneNumber();
+});
+
+function validatePhoneNumber() {
+    const operator = document.getElementById('mobileMoneyType').value;
+    const phoneInput = document.getElementById('telStep3');
+    const phoneNumber = phoneInput.value.trim();
+
+    // Reset des styles
+    phoneInput.classList.remove('is-invalid');
+    phoneInput.classList.remove('is-valid');
+
+    if (!phoneNumber) return;
+
+    let isValid = false;
+
+    if (operator === 'airtel') {
+        // Validation Airtel: commence par 07, puis 4/6/7, et 9 chiffres total
+        const airtelRegex = /^07[467]\d{6}$/;
+        isValid = airtelRegex.test(phoneNumber);
+    }
+    else if (operator === 'moov') {
+        // Validation Moov: commence par 06, puis 0/2/6, et 9 chiffres total
+        const moovRegex = /^06[026]\d{6}$/;
+        isValid = moovRegex.test(phoneNumber);
+    }
+
+    // Appliquer les styles de validation
+    if (isValid) {
+        phoneInput.classList.add('is-valid');
+    } else if (operator && phoneNumber) {
+        phoneInput.classList.add('is-invalid');
+    }
+}
+
+// Mettre à jour le placeholder selon l'opérateur
+document.getElementById('mobileMoneyType').addEventListener('change', function() {
+    const operator = this.value;
+    const phoneInput = document.getElementById('telStep3');
+
+    if (operator === 'airtel') {
+        phoneInput.placeholder = '076273811 (Airtel)';
+    } else if (operator === 'moov') {
+        phoneInput.placeholder = '066339203 (Moov)';
+    } else {
+        phoneInput.placeholder = '074273811';
+    }
+});
+
+// Fonction de validation avant passage au step 5
+function validerEtPasserEtape5() {
+    const operator = document.getElementById('mobileMoneyType').value;
+    const phoneNumber = document.getElementById('telStep3').value.trim();
+
+    // Validation de l'opérateur
+    if (!operator) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Veuillez sélectionner un type de Mobile Money',
+            confirmButtonColor: '#6c5ce7'
+        });
+        return;
+    }
+
+    // Validation du numéro de téléphone
+    if (!phoneNumber) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Veuillez saisir un numéro de téléphone',
+            confirmButtonColor: '#6c5ce7'
+        });
+        return;
+    }
+
+    // Validation du format du numéro
+    validatePhoneNumber();
+
+    if (!document.getElementById('telStep3').classList.contains('is-valid')) {
+        let errorMessage = '';
+
+        if (operator === 'airtel') {
+            errorMessage = 'Numéro Airtel invalide. Le format doit être : 076xxxxxx, 074xxxxxx ou 077xxxxxx (9 chiffres)';
+        } else if (operator === 'moov') {
+            errorMessage = 'Numéro Moov invalide. Le format doit être : 060xxxxxx, 062xxxxxx ou 066xxxxxx (9 chiffres)';
+        }
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Numéro invalide',
+            text: errorMessage,
+            confirmButtonColor: '#6c5ce7'
+        });
+        return;
+    }
+
+    // Si tout est valide, passer à l'étape 5
+    nextStep(5);
+}
+
+/*
+======================================================================================
+FIN VALIDATION DE FORMULAIRE POUR LA SAISIE DE MOBILE MONEY
+======================================================================================
+*/
+
+/*
+===========================================================================
+DEBUT  EN ATTENTE DE A CONFIRMATION DE PAIEMENT
+===========================================================================
+*/
+
+function validerEtPasserEtape5() {
+    const operator = document.getElementById('mobileMoneyType').value;
+    const phoneNumber = document.getElementById('telStep3').value.trim();
+
+    // ... vos validations existantes ...
+
+    // Si tout est valide, afficher la confirmation SweetAlert2
+    Swal.fire({
+        title: 'Confirmation requise',
+        html: `Un pop-up de confirmation a été envoyé au <strong>${phoneNumber}</strong><br>Veuillez saisir votre mot de passe Mobile Money pour finaliser le paiement.`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#6c5ce7',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'J\'ai validé le paiement',
+        cancelButtonText: 'Annuler'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Passer au step 5 seulement après confirmation
+            nextStep(5);
+        }
+    });
+}
+
+
+/*
+===========================================================================
+FIN EN ATTENTE DE A CONFIRMATION DE PAIEMENT
+===========================================================================
 */
 </script>
 
