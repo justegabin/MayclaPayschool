@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>MayclaPaySchool</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta name="description" content="">
   <meta name="keywords" content="">
 
@@ -64,6 +65,26 @@
   to { transform: scale(1); opacity: 1; }
 }
 </style>
+
+ <style>
+        .btn-gradient {
+            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
+            border: none;
+            color: white;
+        }
+        .btn-gradient:hover {
+            background: linear-gradient(45deg, #5245c9, #8479f2);
+            color: white;
+        }
+        .custom-popup {
+            background: linear-gradient(135deg, #2d3436, #636e72);
+            border-radius: 20px;
+        }
+        .form-control[readonly] {
+            background-color: #f8f9fa;
+            opacity: 1;
+        }
+    </style>
 
   <!-- =======================================================
       FIN CSS POP UP
@@ -138,179 +159,135 @@
           =======================================================================================--}}
 
 
-            <div class="modal fade" id="wizardModal1" tabindex="-1" aria-labelledby="wizardModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content custom-popup">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title fw-bold text-white text-center w-100" id="wizardModalLabel">
-                    ✨ Payer la scolarité
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                </div>
+{{-- ===================================================================================== DEBUT POP UP -- Wizard Modal 1 =======================================================================================--}}
+<div class="modal fade" id="wizardModal1" tabindex="-1" aria-labelledby="wizardModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content custom-popup">
 
-                <div class="modal-body text-white">
-                    <!-- Step 1 -->
-                    <div class="wizard-step" id="step1">
+            <!-- Modal Header -->
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold text-white text-center w-100" id="wizardModalLabel">✨ Payer la scolarité</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body text-white">
+
+                {{-- Step 1 --}}
+                <div class="wizard-step" id="step1">
                     <p>Choisissez une option :</p>
                     <div class="d-flex justify-content-center gap-3 mt-3 w-100">
                         <button type="button" class="btn btn-gradient rounded-pill flex-fill" onclick="nextStep(2)">
-                        Payer sans créer un compte
+                            Payer sans créer un compte
                         </button>
-                        {{-- <button type="button" class="btn btn-gradient rounded-pill flex-fill" onclick="nextStep(2)">
-                        Se connecter / Créer un compte
-                        </button> --}}
-
                         <button type="button" class="btn btn-gradient rounded-pill flex-fill" onclick="openWizard2()">
-                        Se connecter / Créer un compte
+                            Se connecter / Créer un compte
                         </button>
                     </div>
-                    </div>
+                </div>
 
-                    <!-- Step 2 -->
-                    <div class="wizard-step d-none" id="step2">
+                {{-- Step 2 --}}
+                <div class="wizard-step  d-none" id="step2">
                     <p>Entrez le matricule de l'apprenant :</p>
-                    <form>
+                    <form id="matriculeForm">
                         <div class="mb-3">
-                        <label for="matriculeInput" class="form-label text-light">Matricule</label>
-                        <input type="text" class="form-control rounded-pill" id="matriculeInput" placeholder="Ex : MBJ25">
+                            <label for="matriculeInput" class="form-label text-light">Matricule</label>
+                            <input type="text" class="form-control rounded-pill" id="matriculeInput" name="matricule" placeholder="Ex : MBJ25" required>
+                            <div id="matriculeError" class="text-danger mt-2 d-none"></div>
                         </div>
                     </form>
                     <div class="d-flex justify-content-between mt-3">
-                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(1)">
-                        Retour
-                        </button>
-                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(3)">
-                        Suivant
+                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(1)">Retour</button>
+                        <button type="button" class="btn btn-gradient rounded-pill px-4" id="rechercherBtn" onclick="rechercherMatricule()">
+                            <span id="rechercherText">Suivant</span>
+                            <span id="rechercherSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
                         </button>
                     </div>
-                    </div>
+                </div>
 
-                    <!-- Step 3 -->
-                    <div class="wizard-step d-none" id="step3">
-                    <p>Choisissez le mode de paiement :</p>
+                {{-- Step 3 --}}
+                <div class="wizard-step d-none" id="step3">
+                    <p>Vérifiez les informations de l'apprenant :</p>
                     <div class="d-flex flex-column gap-2">
-
-                        <form>
                         <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Matricule
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="Ex : MBJ25">
+                            <label class="form-label text-light mb-0" style="width: 140px;">Matricule</label>
+                            <input type="text" class="form-control rounded-pill flex-fill" id="displayMatricule" readonly>
                         </div>
-
                         <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Nom & Prénoms
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="MAYOMBOU Maycla Esther">
+                            <label class="form-label text-light mb-0" style="width: 140px;">Nom & Prénoms</label>
+                            <input type="text" class="form-control rounded-pill flex-fill" id="displayNomPrenom" readonly>
                         </div>
-
                         <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Ecole
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="Ex : Lafontaine">
+                            <label class="form-label text-light mb-0" style="width: 140px;">École</label>
+                            <input type="text" class="form-control rounded-pill flex-fill" id="displayEcole" readonly>
                         </div>
-
                         <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Scolarité mensuelle
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="70.000 FCFA">
+                            <label class="form-label text-light mb-0" style="width: 140px;">Niveau scolaire</label>
+                            <input type="text" class="form-control rounded-pill flex-fill" id="displayNiveau" readonly>
                         </div>
-
-                        </form>
-
-                        {{-- <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(4)">
-                        Carte bancaire
-                        </button>
-                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(4)">
-                        Mobile Money
-                        </button> --}}
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label class="form-label text-light mb-0" style="width: 140px;">Scolarité mensuelle</label>
+                            <input type="text" class="form-control rounded-pill flex-fill" id="displayScolarite" readonly>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label class="form-label text-light mb-0" style="width: 140px;">Frais de service</label>
+                            <input type="text" class="form-control rounded-pill flex-fill" id="displayFrais" readonly>
+                        </div>
                     </div>
                     <div class="d-flex justify-content-between mt-3">
-                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(2)">
-                        Retour
-                        </button>
-                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(4)">
-                        Valider
-                        </button>
+                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(2)">Retour</button>
+                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(4)">Valider</button>
                     </div>
-                    </div>
+                </div>
 
-                    <!-- Step 4 -->
-                    <div class="wizard-step d-none" id="step4">
+                {{-- Step 4 --}}
+                <div class="wizard-step d-none" id="step4">
                     <p>Confirmez votre paiement :</p>
-
-                    <form>
+                    <form id="formStep4">
                         <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Montant à payer
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="70.000 FCFA ">
-                        </div>
-
-                        <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Frais de service
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="1500 FCFA">
-                        </div>
-
-                        <div class="mb-3 d-flex align-items-center gap-3">
-                                <label for="mobileMoneyType" class="form-label text-light mb-0" style="width: 120px;">
-                                    Type mobile money
-                                </label>
-
-                                <select id="mobileMoneyType" class="form-control rounded-pill flex-fill">
-                                    <option value="">-- Sélectionnez --</option>
-                                    <option value="airtel" selected>Airtel Money</option>
-                                    <option value="moov">Moov Money</option>
-                                </select>
+                            <label class="form-label text-light mb-0" style="width: 120px;">Montant à payer</label>
+                            <input type="text" class="form-control rounded-pill flex-fill" id="montantStep4" placeholder="70.000 FCFA">
                         </div>
                         <div class="mb-3 d-flex align-items-center gap-3">
-                            <label for="matriculeInput" class="form-label text-light mb-0" style="width: 120px;">
-                            Numéro de téléphone
-                            </label>
-                            <input type="text" class="form-control rounded-pill flex-fill" id="matriculeInput" placeholder="074273811">
+                            <label class="form-label text-light mb-0" style="width: 120px;">Frais de service</label>
+                            <input type="text" class="form-control rounded-pill flex-fill" id="fraisStep4" placeholder="1500 FCFA">
                         </div>
-
-                        </form>
-
-
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label for="mobileMoneyType" class="form-label text-light mb-0" style="width: 120px;">Type mobile money</label>
+                            <select id="mobileMoneyType" class="form-control rounded-pill flex-fill">
+                                <option value="">-- Sélectionnez --</option>
+                                <option value="airtel" selected>Airtel Money</option>
+                                <option value="moov">Moov Money</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center gap-3">
+                            <label class="form-label text-light mb-0" style="width: 120px;">Numéro de téléphone</label>
+                            <input type="text" class="form-control rounded-pill flex-fill" id="telStep4" placeholder="074273811">
+                        </div>
+                    </form>
                     <div class="d-flex justify-content-between mt-3">
-                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(3)">
-                        Retour
-                        </button>
-                        {{-- <button type="button" class="btn btn-gradient rounded-pill px-4" data-bs-dismiss="modal">
-                        Confirmer
-                        </button> --}}
-                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(5)">
-                        Valider
-                        </button>
+                        <button type="button" class="btn btn-outline-light rounded-pill px-4" onclick="prevStep(3)">Retour</button>
+                        <button type="button" class="btn btn-gradient rounded-pill px-4" onclick="nextStep(5)">Valider</button>
                     </div>
+                </div>
 
-                    </div>
-
-                    <!-- Step 5 -->
-                    <div class="wizard-step d-none" id="step5">
+                {{-- Step 5 --}}
+                <div class="wizard-step d-none" id="step5">
                     <div class="text-center">
                         <h5 class="fw-bold text-success">✅ Paiement réussi !</h5>
-                        <p class="mt-3">Votre paiement a été effectué avec succès.
-                        Un reçu vous a été envoyé par SMS .</p>
+                        <p class="mt-3">Votre paiement a été effectué avec succès. Un reçu vous a été envoyé par SMS.</p>
                     </div>
-
                     <div class="d-flex justify-content-center mt-4">
-                        <button type="button" class="btn btn-gradient rounded-pill px-4" data-bs-dismiss="modal">
-                        Terminer
-                        </button>
+                        <button type="button" class="btn btn-gradient rounded-pill px-4" data-bs-dismiss="modal">Terminer</button>
                     </div>
-                    </div>
+                </div>
 
-                </div>
-                </div>
             </div>
-            </div>
+        </div>
+    </div>
+</div>
+{{-- ===================================================================================== FIN POP UP =======================================================================================--}}
+
 
         {{-- =====================================================================================
           FIN POP UP  <!-- FIN  Wizard Modal  1 -->
@@ -942,78 +919,7 @@
     <!-- Contact Section -->
     {{-- <section id="contact" class="contact section">
 
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>Contact</h2>
-        <p>Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit</p>
-      </div><!-- End Section Title -->
 
-      <div class="container position-relative" data-aos="fade-up" data-aos-delay="100">
-
-        <div class="row gy-4">
-
-          <div class="col-lg-5">
-            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="200">
-              <i class="bi bi-geo-alt flex-shrink-0"></i>
-              <div>
-                <h3>Address</h3>
-                <p>A108 Adam Street, New York, NY 535022</p>
-              </div>
-            </div><!-- End Info Item -->
-
-            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
-              <i class="bi bi-telephone flex-shrink-0"></i>
-              <div>
-                <h3>Call Us</h3>
-                <p>+1 5589 55488 55</p>
-              </div>
-            </div><!-- End Info Item -->
-
-            <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="400">
-              <i class="bi bi-envelope flex-shrink-0"></i>
-              <div>
-                <h3>Email Us</h3>
-                <p>info@example.com</p>
-              </div>
-            </div><!-- End Info Item -->
-
-          </div>
-
-          <div class="col-lg-7">
-            <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="500">
-              <div class="row gy-4">
-
-                <div class="col-md-6">
-                  <input type="text" name="name" class="form-control" placeholder="Your Name" required="">
-                </div>
-
-                <div class="col-md-6 ">
-                  <input type="email" class="form-control" name="email" placeholder="Your Email" required="">
-                </div>
-
-                <div class="col-md-12">
-                  <input type="text" class="form-control" name="subject" placeholder="Subject" required="">
-                </div>
-
-                <div class="col-md-12">
-                  <textarea class="form-control" name="message" rows="6" placeholder="Message" required=""></textarea>
-                </div>
-
-                <div class="col-md-12 text-center">
-                  <div class="loading">Loading</div>
-                  <div class="error-message"></div>
-                  <div class="sent-message">Your message has been sent. Thank you!</div>
-
-                  <button type="submit">Send Message</button>
-                </div>
-
-              </div>
-            </form>
-          </div><!-- End Contact Form -->
-
-        </div>
-
-      </div>
 
     </section> --}}
     <!-- /Contact Section -->
@@ -1107,6 +1013,7 @@ function prevStep(step) {
   nextStep(step);
 }
 
+/*  FERMER LE PREMIER WIZARD ET OUVRIR LE DEUXIEME  */
 function openSecondWizard() {
     // Fermer le premier wizard
     var firstModal = bootstrap.Modal.getInstance(document.getElementById('wizardModal1'));
@@ -1117,6 +1024,8 @@ function openSecondWizard() {
     var secondModal = new bootstrap.Modal(secondModalEl);
     secondModal.show();
 }
+/*  FFIN FERMER LE PREMIER WIZARD ET OUVRIR LE DEUXIEME  */
+
 
 function openWizard2() {
     // Ferme le premier wizard si ouvert
@@ -1131,7 +1040,123 @@ function openWizard2() {
     var secondModal = new bootstrap.Modal(secondModalEl);
     secondModal.show();
 }
+
+/*
+=====================================================================================
+         DEBUT  SCRIPT POUR AFFICHER L'APPRENANT -->
+ =======================================================================================
+
+*/
+
+// Fonction pour rechercher le matricule
+function rechercherMatricule() {
+    const matricule = document.getElementById('matriculeInput').value.trim();
+    const errorDiv = document.getElementById('matriculeError');
+    const rechercherBtn = document.getElementById('rechercherBtn');
+    const rechercherText = document.getElementById('rechercherText');
+    const rechercherSpinner = document.getElementById('rechercherSpinner');
+
+    // Reset erreur
+    errorDiv.classList.add('d-none');
+    errorDiv.textContent = '';
+
+    if (!matricule) {
+        errorDiv.textContent = 'Veuillez saisir un matricule';
+        errorDiv.classList.remove('d-none');
+        return;
+    }
+
+    // Afficher le spinner
+    rechercherText.classList.add('d-none');
+    rechercherSpinner.classList.remove('d-none');
+    rechercherBtn.disabled = true;
+
+    // Envoyer la requête AJAX
+    fetch('/rechercher-matricule', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ matricule: matricule })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erreur serveur: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Remplir les champs avec les données
+            document.getElementById('displayMatricule').value = data.apprenant.matricule || 'N/A';
+            document.getElementById('displayNomPrenom').value = (data.apprenant.nom || '') + ' ' + (data.apprenant.prenom || '');
+            document.getElementById('displayEcole').value = data.apprenant.etablissement || 'N/A';
+            document.getElementById('displayNiveau').value = data.apprenant.niveau || 'N/A';
+            document.getElementById('displayScolarite').value = (data.apprenant.montant_scolarite || '0') + ' FCFA';
+            document.getElementById('displayFrais').value = (data.apprenant.frais || '0') + ' FCFA';
+
+            // Passer à l'étape 3
+            nextStep(3);
+        } else {
+            throw new Error(data.message);
+        }
+    })
+    .catch(error => {
+        errorDiv.textContent = error.message;
+        errorDiv.classList.remove('d-none');
+    })
+    .finally(() => {
+        // Cacher le spinner
+        rechercherText.classList.remove('d-none');
+        rechercherSpinner.classList.add('d-none');
+        rechercherBtn.disabled = false;
+    });
+}
+
+// Fonctions de navigation
+function nextStep(step) {
+    document.querySelectorAll('.wizard-step').forEach(el => {
+        el.classList.add('d-none');
+    });
+    document.getElementById('step' + step).classList.remove('d-none');
+}
+
+function prevStep(step) {
+    document.querySelectorAll('.wizard-step').forEach(el => {
+        el.classList.add('d-none');
+    });
+    document.getElementById('step' + step).classList.remove('d-none');
+}
+
+// Permettre la soumission avec Entrée
+document.getElementById('matriculeInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        rechercherMatricule();
+    }
+});
+
+// Ouvrir le modal automatiquement pour tester
+/* document.addEventListener('DOMContentLoaded', function() {
+    var myModal = new bootstrap.Modal(document.getElementById('wizardModal1'));
+    myModal.show();
+}); */
+
+
+
+
+
+
+/*
+=====================================================================================
+         FIN DU   SCRIPT POUR AFFICHER L'APPRENANT -->
+ =======================================================================================
+
+*/
 </script>
+
 
 </body>
 
